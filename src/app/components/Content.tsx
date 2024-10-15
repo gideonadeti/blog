@@ -39,12 +39,16 @@ export default function Content() {
           </div>
         )}
       </div>
-      {posts.map((post) => (
-        <>
-          <p key={post._id}>{post.title}</p>
-          <p key={post._id}>{post.content}</p>
-        </>
-      ))}
+
+      <ul className="list-group list-group-flush">
+        {posts.length > 0 &&
+          posts.map((post) => (
+            <li key={post._id} className="list-group-item">
+              <p>{post.title}</p>
+              <p>{post.content}</p>
+            </li>
+          ))}
+      </ul>
     </div>
   );
 }
