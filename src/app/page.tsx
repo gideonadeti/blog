@@ -1,7 +1,9 @@
+import Header from "./components/Header";
+
 export default function Home() {
   return (
-    <div>
-      <h1>Blog</h1>
+    <div className="d-flex flex-column min-vh-100">
+      <Header />
     </div>
   );
 }
