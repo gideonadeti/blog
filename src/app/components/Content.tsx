@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  isToday,
+  isYesterday,
+  formatDistanceToNow,
+  format,
+  isThisYear,
+} from "date-fns";
+
 import axios from "axios";
 
 import { usePostsStore } from "../stores/posts";
-import { useSearchParams } from "next/navigation";
 
 export default function Content() {
   const { posts, setPosts } = usePostsStore();
@@ -44,6 +52,32 @@ export default function Content() {
     }
   }, [filter, posts]);
 
+  function formatDate(date: Date) {
+    let formattedDate;
+    const distanceToNow = formatDistanceToNow(date, { addSuffix: true });
+
+    if (isToday(date)) {
+      formattedDate = `${format(date, "h:mm a")} (${distanceToNow})`;
+    } else if (isYesterday(date)) {
+      formattedDate = `Yesterday at ${format(
+        date,
+        "h:mm a"
+      )} (${distanceToNow})`;
+    } else if (isThisYear(date)) {
+      formattedDate = `${format(
+        date,
+        "eee, do MMM 'at' h:mm a"
+      )} (${distanceToNow})`;
+    } else {
+      formattedDate = `${format(
+        date,
+        "eee, do MMM, yyyy 'at' h:mm a"
+      )} (${distanceToNow})`;
+    }
+
+    return formattedDate;
+  }
+
   return (
     <div className="content p-3">
       <div className="d-flex flex-column align-items-center">
@@ -58,9 +92,19 @@ export default function Content() {
       <ul className="list-group list-group-flush">
         {filteredPosts.length > 0 &&
           filteredPosts.map((post) => (
-            <li key={post._id} className="list-group-item">
-              <p>{post.title}</p>
-              <p>{post.content}</p>
+            <li key={post.id} className="list-group-item">
+              <small className="fw-semibold">
+                {formatDate(post.updatedAt)}
+              </small>
+              <div>
+                <p>{post.title}</p>
+                <p>{post.content}</p>
+              </div>
+              <div>
+                <i className="small">
+                  {post.published ? "Published" : "Unpublished"}
+                </i>
+              </div>
             </li>
           ))}
       </ul>
