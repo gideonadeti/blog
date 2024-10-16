@@ -4,7 +4,12 @@ const prisma = new PrismaClient();
 
 export async function readPosts() {
   try {
-    const posts = await prisma.post.findMany();
+    const posts = await prisma.post.findMany({
+      include: {
+        comments: true,
+        tags: true,
+      },
+    });
 
     return posts;
   } catch (error) {
