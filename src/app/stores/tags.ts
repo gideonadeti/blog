@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { TagsStore } from "../types";
 
-export const usePostsStore = create<TagsStore>((set) => ({
+export const useTagsStore = create<TagsStore>((set) => ({
   tags: [],
 
   setTags: (newTags) => set({ tags: newTags }),
