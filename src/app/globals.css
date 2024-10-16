@@ -1,3 +1,7 @@
 .content {
     margin-left: 280px;
 }
+
+p {
+    margin-bottom: 0.25rem;
+}
