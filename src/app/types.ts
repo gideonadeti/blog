@@ -2,6 +2,7 @@ interface Post {
   _id: string;
   title: string;
   content: string;
+  published: boolean;
   createdAt: string;
   updatedAt: string;
 }
