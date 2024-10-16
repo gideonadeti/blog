@@ -60,3 +60,19 @@ export async function createPost(title: string, content: string) {
     throw error;
   }
 }
+
+export async function createTag(name: string) {
+  try {
+    const tag = await prisma.tag.create({
+      data: {
+        name,
+      },
+    });
+
+    return tag;
+  } catch (error) {
+    console.log(error);
+
+    throw error;
+  }
+}

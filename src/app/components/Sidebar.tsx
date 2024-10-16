@@ -19,6 +19,7 @@ const sidebarNavs = [
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const [showCTModal, setShowCTModal] = useState(false); // CT -> CreateTag
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -52,15 +53,25 @@ export default function Sidebar() {
           </div>
         ))}
       </div>
-      <div>
+      <div className="d-flex flex-column gap-2">
         <div
-          className="btn text-decoration-none bg-light px-2 py-1 rounded w-100"
-          onClick={() => setOpen(!open)}
+          className="btn text-decoration-none bg-light px-2 py-1 rounded"
+          onClick={() => setShowCTModal(true)}
+        >
+          Create tag
+        </div>
+        <div
+          className="btn text-decoration-none bg-light px-2 py-1 rounded"
+          onClick={() => setOpen(true)}
         >
           Create post
         </div>
       </div>
       <CreatePostModal open={open} setOpen={setOpen} />
+      <CreateTagModal
+        showCTModal={showCTModal}
+        setShowCTModal={setShowCTModal}
+      />
     </div>
   );
 }
@@ -96,8 +107,6 @@ function CreatePostModal({
       const response = await axios.post("/api/posts", formData);
 
       setPost(response.data.post);
-
-      handleClose();
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -192,6 +201,116 @@ function CreatePostModal({
         ) : (
           <p className="text-center">Please create a tag first</p>
         )}
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+interface CreateTagForm {
+  name: string;
+}
+
+function CreateTagModal({
+  showCTModal,
+  setShowCTModal,
+}: {
+  showCTModal: boolean;
+  setShowCTModal: (showCTModal: boolean) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateTagForm>();
+  const { setTag } = useTagsStore();
+  const [message, setMessage] = useState("");
+
+  async function onSubmit(formData: CreateTagForm) {
+    try {
+      setLoading(true);
+      setError("");
+      setMessage("");
+
+      const response = await axios.post("/api/tags", formData);
+      const tags = response.data.tags;
+
+      console.log(tags);
+
+      if (tags.length > 1) {
+        tags.forEach((tag: Tag) => {
+          setTag(tag);
+        });
+      } else {
+        setTag(tags[0]);
+      }
+
+      setMessage("Tag(s) created successfully");
+      reset();
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleClose() {
+    reset();
+    setShowCTModal(false);
+    setError("");
+    setMessage("");
+  }
+
+  return (
+    <Modal
+      show={showCTModal}
+      onHide={handleClose}
+      backdrop="static"
+      keyboard={false}
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Create Tag</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {error && <p className="text-danger text-center">{error}</p>}
+        {message && <p className="text-success text-center">{message}</p>}
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form.Group className="mb-3">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              type="text"
+              {...register("name", { required: "Name is required" })}
+              autoFocus
+            />
+            <div className="form-text">
+              Create multiple tags by separating names with commas
+            </div>
+            {errors.name && (
+              <Form.Text className="text-danger">
+                {errors.name.message}
+              </Form.Text>
+            )}
+          </Form.Group>
+          <Form.Group className="mb-3 d-flex justify-content-end gap-3">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create"}
+            </button>
+          </Form.Group>
+        </Form>
       </Modal.Body>
     </Modal>
   );
