@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import axios from "axios";
+
+import { usePostsStore } from "../stores/posts";
 
 const sidebarNavs = [
   { name: "All", filter: "all" },
@@ -73,15 +76,31 @@ function CreatePostModal({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<CreateForm>();
+  const { setPost } = usePostsStore();
 
-  async function onSubmit(data: CreateForm) {
-    console.log(data);
+  async function onSubmit(formData: CreateForm) {
+    try {
+      setLoading(true);
+
+      const response = await axios.post("/api/posts", formData);
+
+      setPost(response.data.post);
+
+      handleClose();
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleClose() {
@@ -101,6 +120,7 @@ function CreatePostModal({
         <Modal.Title>Create Post</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {error && <p className="text-danger text-center">{error}</p>}
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className="mb-3">
             <Form.Label>Title</Form.Label>
@@ -108,6 +128,7 @@ function CreatePostModal({
               type="text"
               placeholder="Enter title"
               {...register("title", { required: "Title is required" })}
+              autoFocus
             />
             {errors.title && (
               <Form.Text className="text-danger">
@@ -134,11 +155,16 @@ function CreatePostModal({
               type="button"
               className="btn btn-secondary"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              Create
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create"}
             </button>
           </Form.Group>
         </Form>
