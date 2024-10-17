@@ -13,7 +13,7 @@ const sidebarNavs = [
 ];
 
 export default function Sidebar() {
-  const [showCPModal, setShowCPModal] = useState(false);
+  const [showCPModal, setShowCPModal] = useState(false); // CP -> CreatePost
   const [showCTModal, setShowCTModal] = useState(false); // CT -> CreateTag
 
   const searchParams = useSearchParams();
