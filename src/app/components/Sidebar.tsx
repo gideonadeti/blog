@@ -2,14 +2,9 @@
 
 import { useState } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
-import axios from "axios";
-import { Tag } from "@prisma/client";
 
-import { usePostsStore } from "../stores/posts";
-import { useTagsStore } from "../stores/tags";
+import CreatePostModal from "./CreatePostModal";
+import CreateTagModal from "./CreateTagModal";
 
 const sidebarNavs = [
   { name: "All", filter: "all" },
@@ -18,7 +13,7 @@ const sidebarNavs = [
 ];
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(false);
+  const [showCPModal, setShowCPModal] = useState(false);
   const [showCTModal, setShowCTModal] = useState(false); // CT -> CreateTag
 
   const searchParams = useSearchParams();
@@ -62,256 +57,19 @@ export default function Sidebar() {
         </div>
         <div
           className="btn text-decoration-none bg-light px-2 py-1 rounded"
-          onClick={() => setOpen(true)}
+          onClick={() => setShowCPModal(true)}
         >
           Create post
         </div>
       </div>
-      <CreatePostModal open={open} setOpen={setOpen} />
+      <CreatePostModal
+        showCPModal={showCPModal}
+        setShowCPModal={setShowCPModal}
+      />
       <CreateTagModal
         showCTModal={showCTModal}
         setShowCTModal={setShowCTModal}
       />
     </div>
-  );
-}
-
-interface CreateForm {
-  title: string;
-  content: string;
-  tags: Tag[];
-}
-
-function CreatePostModal({
-  open,
-  setOpen,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateForm>();
-  const { setPost } = usePostsStore();
-  const { tags } = useTagsStore();
-
-  async function onSubmit(formData: CreateForm) {
-    try {
-      setLoading(true);
-
-      const response = await axios.post("/api/posts", formData);
-
-      setPost(response.data.post);
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleClose() {
-    reset();
-    setOpen(false);
-  }
-
-  return (
-    <Modal
-      show={open}
-      onHide={handleClose}
-      backdrop="static"
-      keyboard={false}
-      fullscreen
-    >
-      <Modal.Header closeButton>
-        <Modal.Title>Create Post</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error && <p className="text-danger text-center">{error}</p>}
-        {tags.length > 0 ? (
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group className="mb-3">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter title"
-                {...register("title", { required: "Title is required" })}
-                autoFocus
-              />
-              {errors.title && (
-                <Form.Text className="text-danger">
-                  {errors.title.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Content</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={12}
-                {...register("content", { required: "Content is required" })}
-              />
-              {errors.content && (
-                <Form.Text className="text-danger">
-                  {errors.content.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Tags</Form.Label>
-              <Form.Select
-                multiple
-                {...register("tags", { required: "Tags are required" })}
-              >
-                {tags.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </option>
-                ))}
-              </Form.Select>
-              {errors.tags && (
-                <Form.Text className="text-danger">
-                  {errors.tags.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-            <Form.Group className="mb-3 d-flex justify-content-end gap-3">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleClose}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? "Creating..." : "Create"}
-              </button>
-            </Form.Group>
-          </Form>
-        ) : (
-          <p className="text-center">Please create a tag first</p>
-        )}
-      </Modal.Body>
-    </Modal>
-  );
-}
-
-interface CreateTagForm {
-  name: string;
-}
-
-function CreateTagModal({
-  showCTModal,
-  setShowCTModal,
-}: {
-  showCTModal: boolean;
-  setShowCTModal: (showCTModal: boolean) => void;
-}) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateTagForm>();
-  const { setTag } = useTagsStore();
-  const [message, setMessage] = useState("");
-
-  async function onSubmit(formData: CreateTagForm) {
-    try {
-      setLoading(true);
-      setError("");
-      setMessage("");
-
-      const response = await axios.post("/api/tags", formData);
-      const tags = response.data.tags;
-
-      console.log(tags);
-
-      if (tags.length > 1) {
-        tags.forEach((tag: Tag) => {
-          setTag(tag);
-        });
-      } else {
-        setTag(tags[0]);
-      }
-
-      setMessage("Tag(s) created successfully");
-      reset();
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleClose() {
-    reset();
-    setShowCTModal(false);
-    setError("");
-    setMessage("");
-  }
-
-  return (
-    <Modal
-      show={showCTModal}
-      onHide={handleClose}
-      backdrop="static"
-      keyboard={false}
-    >
-      <Modal.Header closeButton>
-        <Modal.Title>Create Tag</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error && <p className="text-danger text-center">{error}</p>}
-        {message && <p className="text-success text-center">{message}</p>}
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              type="text"
-              {...register("name", { required: "Name is required" })}
-              autoFocus
-            />
-            <div className="form-text">
-              Create multiple tags by separating names with commas
-            </div>
-            {errors.name && (
-              <Form.Text className="text-danger">
-                {errors.name.message}
-              </Form.Text>
-            )}
-          </Form.Group>
-          <Form.Group className="mb-3 d-flex justify-content-end gap-3">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? "Creating..." : "Create"}
-            </button>
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-    </Modal>
   );
 }

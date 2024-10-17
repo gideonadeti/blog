@@ -15,3 +15,13 @@ export interface TagsStore {
   setTag: (newTag: Tag) => void;
   clearTags: () => void;
 }
+
+export interface CreatePostForm {
+  title: string;
+  content: string;
+  tags: Tag[];
+}
+
+export interface CreateTagForm {
+  name: string;
+}
