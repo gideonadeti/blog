@@ -13,7 +13,7 @@ model Post {
   content   String
   published Boolean   @default(false)
   comments  Comment[]
-  tags      PostTag[]
+  postTags  PostTag[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
