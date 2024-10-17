@@ -5,7 +5,6 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import { Tag } from "@prisma/client";
 
-
 import { CreateTagForm } from "../types";
 import { useTagsStore } from "../stores/tags";
 
@@ -35,8 +34,6 @@ export default function CreateTagModal({
 
       const response = await axios.post("/api/tags", formData);
       const tags = response.data.tags;
-
-      console.log(tags);
 
       if (tags.length > 1) {
         tags.forEach((tag: Tag) => {
