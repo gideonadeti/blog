@@ -36,7 +36,7 @@ export default function Content() {
         setPosts(responses[0].data.posts);
         setTags(responses[1].data.tags);
       } catch (error) {
-        console.log(error);
+        console.error(error);
 
         setError("Something went wrong");
       } finally {
