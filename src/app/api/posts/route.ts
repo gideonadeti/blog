@@ -1,4 +1,9 @@
-import { readPosts, createPost, createPostTag } from "../../../../prisma/db";
+import {
+  readPosts,
+  createPost,
+  createPostTag,
+  readPost,
+} from "../../../../prisma/db";
 
 export async function GET() {
   try {
@@ -31,13 +36,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const post = await createPost(title, content);
+    const newPost = await createPost(title, content);
 
     await Promise.all(
       tagIds.map(async (tagId: string) => {
-        await createPostTag(post.id, tagId);
+        await createPostTag(newPost.id, tagId);
       })
     );
+
+    const post = await readPost(newPost.id);
 
     return Response.json({ post }, { status: 201 });
   } catch (error) {

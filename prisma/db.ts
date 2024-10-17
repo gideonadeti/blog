@@ -109,3 +109,27 @@ export async function createPostTag(postId: string, tagId: string) {
     throw error;
   }
 }
+
+export async function readPost(postId: string) {
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        comments: true,
+        postTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
