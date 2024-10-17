@@ -6,7 +6,7 @@ export async function GET() {
 
     return Response.json({ posts }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return Response.json(
       {
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     return Response.json({ post }, { status: 201 });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return Response.json(
       {
