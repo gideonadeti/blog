@@ -9,27 +9,32 @@ import {
   format,
   isThisYear,
 } from "date-fns";
-
 import axios from "axios";
 
 import { usePostsStore } from "../stores/posts";
+import { useTagsStore } from "../stores/tags";
 
 export default function Content() {
   const { posts, setPosts } = usePostsStore();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [filteredPosts, setFilteredPosts] = useState(posts);
-
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
+  const { setTags } = useTagsStore();
 
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const response = await axios.get("/api/posts");
 
-        setPosts(response.data.posts);
+        const responses = await Promise.all([
+          axios.get("/api/posts"),
+          axios.get("/api/tags"),
+        ]);
+
+        setPosts(responses[0].data.posts);
+        setTags(responses[1].data.tags);
       } catch (error) {
         console.log(error);
 
@@ -39,8 +44,8 @@ export default function Content() {
       }
     }
 
-    fetchPosts();
-  }, [setPosts]);
+    fetchData();
+  }, [setPosts, setTags]);
 
   useEffect(() => {
     if (filter === "published") {

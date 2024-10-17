@@ -1,5 +1,6 @@
-import { createTag } from "../../../../prisma/db";
 import { Tag } from "@prisma/client";
+
+import { createTag, readTags } from "../../../../prisma/db";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,23 @@ export async function POST(request: Request) {
     );
 
     return Response.json({ tags }, { status: 201 });
+  } catch (error) {
+    console.error(error);
+
+    return Response.json(
+      {
+        error: "Something went wrong",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    const tags = await readTags();
+
+    return Response.json({ tags }, { status: 200 });
   } catch (error) {
     console.error(error);
 

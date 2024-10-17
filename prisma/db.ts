@@ -76,3 +76,15 @@ export async function createTag(name: string) {
     throw error;
   }
 }
+
+export async function readTags() {
+  try {
+    const tags = await prisma.tag.findMany();
+
+    return tags;
+  } catch (error) {
+    console.log(error);
+
+    throw error;
+  }
+}
