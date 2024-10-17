@@ -88,3 +88,20 @@ export async function readTags() {
     throw error;
   }
 }
+
+export async function createPostTag(postId: string, tagId: string) {
+  try {
+    const postTag = await prisma.postTag.create({
+      data: {
+        postId,
+        tagId,
+      },
+    });
+
+    return postTag;
+  } catch (error) {
+    console.log(error);
+
+    throw error;
+  }
+}
