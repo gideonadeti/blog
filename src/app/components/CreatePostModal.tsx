@@ -33,6 +33,7 @@ export default function CreatePostModal({
       const response = await axios.post("/api/posts", formData);
 
       setPost(response.data.post);
+      handleClose();
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -43,6 +44,7 @@ export default function CreatePostModal({
   function handleClose() {
     reset();
     setShowCPModal(false);
+    setError("");
   }
 
   return (
@@ -92,7 +94,7 @@ export default function CreatePostModal({
               <Form.Label>Tags</Form.Label>
               <Form.Select
                 multiple
-                {...register("tags", { required: "Tags are required" })}
+                {...register("tagIds", { required: "Tags are required" })}
               >
                 {tags.map((tag) => (
                   <option key={tag.id} value={tag.id}>
@@ -100,9 +102,9 @@ export default function CreatePostModal({
                   </option>
                 ))}
               </Form.Select>
-              {errors.tags && (
+              {errors.tagIds && (
                 <Form.Text className="text-danger">
-                  {errors.tags.message}
+                  {errors.tagIds.message}
                 </Form.Text>
               )}
             </Form.Group>

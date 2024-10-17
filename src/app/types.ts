@@ -19,7 +19,7 @@ export interface TagsStore {
 export interface CreatePostForm {
   title: string;
   content: string;
-  tags: Tag[];
+  tagIds: string[];
 }
 
 export interface CreateTagForm {
