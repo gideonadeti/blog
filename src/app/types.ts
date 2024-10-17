@@ -1,5 +1,4 @@
-import { Post } from "@prisma/client";
-import { Tag } from "@prisma/client";
+import { Post, Tag } from "@prisma/client";
 
 export interface PostsStore {
   posts: Post[];
