@@ -13,7 +13,7 @@ export async function readPosts() {
 
     return posts;
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
@@ -38,7 +38,7 @@ export async function seedPosts() {
       ],
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
@@ -55,7 +55,7 @@ export async function createPost(title: string, content: string) {
 
     return post;
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
@@ -71,7 +71,7 @@ export async function createTag(name: string) {
 
     return tag;
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
@@ -83,7 +83,7 @@ export async function readTags() {
 
     return tags;
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
@@ -100,7 +100,7 @@ export async function createPostTag(postId: string, tagId: string) {
 
     return postTag;
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     throw error;
   }
