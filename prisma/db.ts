@@ -7,7 +7,11 @@ export async function readPosts() {
     const posts = await prisma.post.findMany({
       include: {
         comments: true,
-        tags: true,
+        postTags: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
 

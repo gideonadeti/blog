@@ -1,7 +1,12 @@
-import { Post, Tag, Comment } from "@prisma/client";
+import { Post, Tag, Comment, PostTag } from "@prisma/client";
+
+export interface ExtendedPostTag extends PostTag {
+  tag: Tag;
+  post: Post;
+}
 
 interface ExtendedPost extends Post {
-  tags: Tag[];
+  postTags: ExtendedPostTag[];
   comments: Comment;
 }
 

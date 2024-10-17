@@ -106,9 +106,19 @@ export default function Content() {
                 <p>{post.content}</p>
               </div>
               <div>
-                <i className="small">
+                <span className="small">
                   {post.published ? "Published" : "Unpublished"}
-                </i>
+                </span>
+                <span className="small ms-2">
+                  {post.postTags.map((postTag) => (
+                    <span
+                      key={postTag.id}
+                      className="badge text-bg-secondary me-1"
+                    >
+                      {postTag.tag.name}
+                    </span>
+                  ))}
+                </span>
               </div>
             </li>
           ))}
