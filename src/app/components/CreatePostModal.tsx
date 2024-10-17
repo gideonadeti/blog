@@ -95,7 +95,7 @@ export default function CreatePostModal({
                 {...register("tags", { required: "Tags are required" })}
               >
                 {tags.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
+                  <option key={tag.id} value={tag.name}>
                     {tag.name}
                   </option>
                 ))}
