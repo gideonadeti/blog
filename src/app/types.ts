@@ -1,10 +1,15 @@
-import { Post, Tag } from "@prisma/client";
+import { Post, Tag, Comment } from "@prisma/client";
+
+interface ExtendedPost extends Post {
+  tags: Tag[];
+  comments: Comment;
+}
 
 export interface PostsStore {
-  posts: Post[];
+  posts: ExtendedPost[];
 
-  setPosts: (newPosts: Post[]) => void;
-  setPost: (newPost: Post) => void;
+  setPosts: (newPosts: ExtendedPost[]) => void;
+  setPost: (newPost: ExtendedPost) => void;
   clearPosts: () => void;
 }
 
