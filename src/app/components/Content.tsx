@@ -110,7 +110,7 @@ export default function Content() {
                 <p>{post.content}</p>
               </div>
               <div>
-                <span className="small">
+                <span className="small fst-italic text-secondary">
                   {post.published ? "Published" : "Unpublished"}
                 </span>
                 <span className="small ms-2">
