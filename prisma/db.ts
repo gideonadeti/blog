@@ -133,3 +133,19 @@ export async function readPost(postId: string) {
     throw error;
   }
 }
+
+export async function readTag(name: string) {
+  try {
+    const tag = await prisma.tag.findUnique({
+      where: {
+        name,
+      },
+    });
+
+    return tag;
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
