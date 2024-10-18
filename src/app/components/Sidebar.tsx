@@ -48,27 +48,15 @@ export default function Sidebar() {
           </div>
         ))}
       </div>
-      <div className="d-flex flex-column gap-2">
-        <div
-          className="btn text-decoration-none bg-light px-2 py-1 rounded"
-          onClick={() => setShowCTModal(true)}
-        >
-          Create tag
-        </div>
-        <div
-          className="btn text-decoration-none bg-light px-2 py-1 rounded"
-          onClick={() => setShowCPModal(true)}
-        >
-          Create post
-        </div>
+      <div
+        className="btn text-decoration-none bg-light px-2 py-1 rounded"
+        onClick={() => setShowCPModal(true)}
+      >
+        Create post
       </div>
       <CreatePostModal
         showCPModal={showCPModal}
         setShowCPModal={setShowCPModal}
-      />
-      <CreateTagModal
-        showCTModal={showCTModal}
-        setShowCTModal={setShowCTModal}
       />
     </div>
   );
