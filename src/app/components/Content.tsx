@@ -94,6 +94,10 @@ export default function Content() {
         )}
       </div>
 
+      {filteredPosts.length === 0 && (
+        <p className="text-center">No posts found</p>
+      )}
+
       <ul className="list-group list-group-flush">
         {filteredPosts.length > 0 &&
           filteredPosts.map((post) => (
