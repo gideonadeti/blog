@@ -3,7 +3,10 @@ import Main from "./components/Main";
 
 export default function Home() {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div
+      className="d-flex flex-column overflow-y-hidden"
+      style={{ height: "100vh" }}
+    >
       <Header />
       <Main />
     </div>

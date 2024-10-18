@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <header className="container-fluid text-center shadow-sm py-2">
+    <header className="container-fluid text-center shadow-sm py-2 z-1">
       <h1>Blog</h1>
     </header>
   );

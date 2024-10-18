@@ -84,7 +84,7 @@ export default function Content() {
   }
 
   return (
-    <div className="content p-3">
+    <div className="content p-3 overflow-y-auto" style={{ maxHeight: "90vh" }}>
       <div className="d-flex flex-column align-items-center">
         {error && <p className="text-danger">{error}</p>}
         {loading && (
