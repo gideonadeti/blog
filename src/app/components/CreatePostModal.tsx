@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useRef } from "react";
 import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import axios from "axios";
+import { Editor } from "@tinymce/tinymce-react";
 
 import { usePostsStore } from "../stores/posts";
-import { useTagsStore } from "../stores/tags";
-import { CreatePostForm } from "../types";
 
 export default function CreatePostModal({
   showCPModal,
@@ -17,118 +14,113 @@ export default function CreatePostModal({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreatePostForm>();
   const { setPost } = usePostsStore();
-  const { tags } = useTagsStore();
+  const editorRef = useRef(null);
 
-  async function onSubmit(formData: CreatePostForm) {
+  function handleClose() {
+    setShowCPModal(false);
+    setError("");
+  }
+
+  async function handleSubmit() {
+    // hashTagsTitleContent, meaning it consists of the hashTags, Title, and content for the post
+    // @ts-expect-error: getContent doesn't exist on never and I'm not sure what to do
+    const hashTagsTitleContent = editorRef.current?.getContent();
+
+    if (!hashTagsTitleContent) {
+      setError("Please enter a post.");
+      return;
+    }
+
+    const [hashTags, title, content] =
+      hashTagsTitleContent.split("\n<p>/sep</p>\n");
+
+    if (hashTags.length === 0 || title.length === 0 || content.length === 0) {
+      setError(
+        "Please enter a valid post. Include hashTags, title, and content."
+      );
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const response = await axios.post("/api/posts", formData);
+      const response = await axios.post("/api/posts", {
+        hashTags,
+        title,
+        content,
+      });
 
       setPost(response.data.post);
       handleClose();
-    } catch {
+    } catch (error) {
+      console.error(error);
+
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  function handleClose() {
-    reset();
-    setShowCPModal(false);
-    setError("");
-  }
-
   return (
-    <Modal
-      show={showCPModal}
-      onHide={handleClose}
-      backdrop="static"
-      keyboard={false}
-      fullscreen
-    >
+    <Modal show={showCPModal} onHide={handleClose} fullscreen>
       <Modal.Header closeButton>
         <Modal.Title>Create Post</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <p className="text-danger text-center">{error}</p>}
-        {tags.length > 0 ? (
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group className="mb-3">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter title"
-                {...register("title", { required: "Title is required" })}
-                autoFocus
-              />
-              {errors.title && (
-                <Form.Text className="text-danger">
-                  {errors.title.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Content</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={12}
-                {...register("content", { required: "Content is required" })}
-              />
-              {errors.content && (
-                <Form.Text className="text-danger">
-                  {errors.content.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Tags</Form.Label>
-              <Form.Select
-                multiple
-                {...register("tagIds", { required: "Tags are required" })}
-              >
-                {tags.map((tag) => (
-                  <option key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </option>
-                ))}
-              </Form.Select>
-              {errors.tagIds && (
-                <Form.Text className="text-danger">
-                  {errors.tagIds.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-            <Form.Group className="mb-3 d-flex justify-content-end gap-3">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleClose}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? "Creating..." : "Create"}
-              </button>
-            </Form.Group>
-          </Form>
-        ) : (
-          <p className="text-center">Please create a tag first</p>
-        )}
+        <Editor
+          apiKey={process.env.NEXT_PUBLIC_TinyMCE_API_Key}
+          // @ts-expect-error: Type 'Editor' is not assignable to type 'null' and I'm not sure what to do
+          onInit={(_evt, editor) => (editorRef.current = editor)}
+          init={{
+            height: 500,
+            menubar: true,
+            plugins: [
+              "advlist",
+              "autolink",
+              "lists",
+              "link",
+              "image",
+              "charmap",
+              "preview",
+              "anchor",
+              "searchreplace",
+              "visualblocks",
+              "code",
+              "fullscreen",
+              "insertdatetime",
+              "media",
+              "table",
+              "code",
+              "help",
+              "wordcount",
+            ],
+            toolbar:
+              "undo redo | blocks | " +
+              "bold italic forecolor | alignleft aligncenter " +
+              "alignright alignjustify | bullist numlist outdent indent | " +
+              "removeformat | help",
+            content_style:
+              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+          }}
+        />
+        <div className="d-flex gap-3 mt-3">
+          <button
+            className="btn btn-secondary"
+            onClick={handleClose}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-primary"
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            {loading ? "Creating..." : "Create"}
+          </button>
+        </div>
       </Modal.Body>
     </Modal>
   );

@@ -3,6 +3,8 @@ import {
   createPost,
   createPostTag,
   readPost,
+  readTag,
+  createTag,
 } from "../../../../prisma/db";
 
 export async function GET() {
@@ -23,24 +25,36 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const { title, content, hashTags } = await request.json();
+
+  if (!title || !content || hashTags.length === 0) {
+    return Response.json(
+      {
+        error: "Title, content, and hashTags are required",
+      },
+      { status: 400 }
+    );
+  }
+
+  const tagNames = hashTags
+    .replace(/<\/?p>/g, "")
+    .split(",")
+    .map((tagName: string) => tagName.trim().replace("#", "").toLowerCase());
+
   try {
-    const body = await request.json();
-    const { title, content, tagIds } = body;
-
-    if (!title || !content || !tagIds || tagIds.length === 0) {
-      return Response.json(
-        {
-          error: "Title, content, and tags are required",
-        },
-        { status: 400 }
-      );
-    }
-
     const newPost = await createPost(title, content);
 
     await Promise.all(
-      tagIds.map(async (tagId: string) => {
-        await createPostTag(newPost.id, tagId);
+      tagNames.map(async (tagName: string) => {
+        const tag = await readTag(tagName);
+
+        if (tag) {
+          await createPostTag(newPost.id, tag.id);
+        } else {
+          const newTag = await createTag(tagName);
+
+          await createPostTag(newPost.id, newTag.id);
+        }
       })
     );
 
