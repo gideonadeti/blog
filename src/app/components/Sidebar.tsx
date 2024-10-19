@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 import CreatePostModal from "./CreatePostModal";
-import CreateTagModal from "./CreateTagModal";
 
 const sidebarNavs = [
   { name: "All", filter: "all" },
@@ -14,7 +13,6 @@ const sidebarNavs = [
 
 export default function Sidebar() {
   const [showCPModal, setShowCPModal] = useState(false); // CP -> CreatePost
-  const [showCTModal, setShowCTModal] = useState(false); // CT -> CreateTag
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
