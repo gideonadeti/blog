@@ -15,6 +15,7 @@ export interface PostsStore {
 
   setPosts: (newPosts: ExtendedPost[]) => void;
   setPost: (newPost: ExtendedPost) => void;
+  updatePost: (postId: string, updatedPost: ExtendedPost) => void;
   clearPosts: () => void;
 }
 
