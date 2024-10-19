@@ -7,6 +7,7 @@ import Alert from "react-bootstrap/Alert";
 import { usePostsStore } from "@/app/stores/posts";
 import { ExtendedPost } from "@/app/types";
 import formatDate from "@/app/utils/format-date";
+import CreatePostModal from "@/app/components/CreatePostModal";
 
 export default function Post({ params }: { params: { postId: string } }) {
   const postId = params.postId;
@@ -15,6 +16,8 @@ export default function Post({ params }: { params: { postId: string } }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [showCPModal, setShowCPModal] = useState(false);
+  const [initialValue, setInitialValue] = useState("");
 
   useEffect(() => {
     const foundPost = posts.find((post) => post.id === postId);
@@ -23,6 +26,21 @@ export default function Post({ params }: { params: { postId: string } }) {
 
   if (!post) {
     return <div>Loading or post not found</div>;
+  }
+
+  function handleEdit() {
+    if (!post) {
+      return;
+    }
+
+    const rawHTML = `<p>${post.postTags
+      .map((postTag) => `#${postTag.tag.name}`)
+      .join(", ")}</p>\n<p>/sep</p>\n${post.title}\n<p>/sep</p>\n${
+      post.content
+    }</p>`;
+
+    setInitialValue(rawHTML);
+    setShowCPModal(true);
   }
 
   async function togglePublish() {
@@ -70,13 +88,21 @@ export default function Post({ params }: { params: { postId: string } }) {
             </span>
           ))}
         </span>
-        <button
-          className="ms-auto btn btn-sm btn-outline-primary"
-          onClick={togglePublish}
-          disabled={loading}
-        >
-          {post.published ? "Unpublish" : "Publish"}
-        </button>
+        <span className="ms-auto d-flex gap-2">
+          <button
+            className="btn btn-sm btn-outline-secondary"
+            onClick={handleEdit}
+          >
+            Edit
+          </button>
+          <button
+            className="btn btn-sm btn-outline-primary"
+            onClick={togglePublish}
+            disabled={loading}
+          >
+            {post.published ? "Unpublish" : "Publish"}
+          </button>
+        </span>
       </div>
 
       <div>
@@ -87,7 +113,12 @@ export default function Post({ params }: { params: { postId: string } }) {
           }}
         />
       </div>
-      <div className="d-flex mt-3"></div>
+      <CreatePostModal
+        showCPModal={showCPModal}
+        setShowCPModal={setShowCPModal}
+        initialValue={initialValue}
+        postId={post.id}
+      />
     </div>
   );
 }
