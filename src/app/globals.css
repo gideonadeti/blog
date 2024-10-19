@@ -9,3 +9,7 @@ p {
 a {
   text-decoration: none;
 }
+
+.sidebar-link * {
+  font: unset !important;
+}
