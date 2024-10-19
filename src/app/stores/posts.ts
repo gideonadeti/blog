@@ -1,5 +1,4 @@
 import { create } from "zustand";
-
 import { PostsStore } from "../types";
 
 export const usePostsStore = create<PostsStore>((set) => ({
@@ -11,5 +10,13 @@ export const usePostsStore = create<PostsStore>((set) => ({
       posts: [...state.posts, newPost],
     }));
   },
+  updatePost: (postId, updatedPost) => {
+    set((state) => ({
+      posts: state.posts.map((post) =>
+        post.id === postId ? { ...post, ...updatedPost } : post
+      ),
+    }));
+  },
+
   clearPosts: () => set({ posts: [] }),
 }));
