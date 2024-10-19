@@ -5,7 +5,7 @@ export interface ExtendedPostTag extends PostTag {
   post: Post;
 }
 
-interface ExtendedPost extends Post {
+export interface ExtendedPost extends Post {
   postTags: ExtendedPostTag[];
   comments: Comment;
 }
