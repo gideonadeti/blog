@@ -168,3 +168,86 @@ export async function updatePublish(postId: string, published: boolean) {
     throw error;
   }
 }
+
+export async function updatePost(
+  postId: string,
+  title: string,
+  content: string
+) {
+  try {
+    const post = await prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        title,
+        content,
+      },
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
+
+export async function updatePostTags(postId: string, tagNames: string[]) {
+  try {
+    await prisma.postTag.deleteMany({
+      where: {
+        postId: postId,
+      },
+    });
+
+    await Promise.all(
+      tagNames.map(async (tagName) => {
+        let tag = await prisma.tag.findUnique({
+          where: {
+            name: tagName,
+          },
+        });
+
+        if (!tag) {
+          tag = await prisma.tag.create({
+            data: {
+              name: tagName,
+            },
+          });
+        }
+
+        await prisma.postTag.create({
+          data: {
+            postId: postId,
+            tagId: tag.id,
+          },
+        });
+      })
+    );
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
+
+export async function createPostTags(postId: string, tagNames: string[]) {
+  try {
+    tagNames.forEach(async (tagName: string) => {
+      const tag = await readTag(tagName);
+
+      if (tag) {
+        await createPostTag(postId, tag.id);
+      } else {
+        const newTag = await createTag(tagName);
+
+        await createPostTag(postId, newTag.id);
+      }
+    });
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
