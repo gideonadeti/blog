@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   const tagNames = hashTags
-    .replace(/<\/?p>/g, "")
+    .replace(/<[^>]+>/g, "") // Remove all HTML tags
     .split(",")
     .map((tagName: string) => tagName.trim().replace("#", "").toLowerCase());
 
