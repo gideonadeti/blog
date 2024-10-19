@@ -32,8 +32,11 @@ export default function CreatePostModal({
       return;
     }
 
-    const [hashTags, title, content] =
-      hashTagsTitleContent.split("\n<p>/sep</p>\n");
+    const [hashTags, title, content] = hashTagsTitleContent.split(
+      /<p[^>]*>.*?\/sep.*?<\/p>/i
+    );
+
+    console.log({ hashTags, title, content });
 
     if (hashTags.length === 0 || title.length === 0 || content.length === 0) {
       setError(
