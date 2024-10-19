@@ -1,7 +1,11 @@
 .content {
-    margin-left: 280px;
+  margin-left: 280px;
 }
 
 p {
-    margin-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+a {
+  text-decoration: none;
 }

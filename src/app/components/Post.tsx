@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ExtendedPost } from "../types";
 import formatDate from "../utils/format-date";
 
@@ -23,7 +25,7 @@ export default function Post({ post }: { post: ExtendedPost }) {
           }}
         />
       </div>
-      <div>
+      <div className="d-flex">
         <span className="small fst-italic text-secondary">
           {post.published ? "Published" : "Unpublished"}
         </span>
@@ -34,6 +36,9 @@ export default function Post({ post }: { post: ExtendedPost }) {
             </span>
           ))}
         </span>
+        <Link href={`/posts/${post.id}`} className="small ms-auto">
+          Read more
+        </Link>
       </div>
     </li>
   );
