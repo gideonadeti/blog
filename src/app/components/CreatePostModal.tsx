@@ -8,13 +8,17 @@ import { usePostsStore } from "../stores/posts";
 export default function CreatePostModal({
   showCPModal,
   setShowCPModal,
+  initialValue,
+  postId,
 }: {
   showCPModal: boolean;
   setShowCPModal: (showCPModal: boolean) => void;
+  initialValue?: string;
+  postId?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { setPost } = usePostsStore();
+  const { setPost, updatePost } = usePostsStore();
   const editorRef = useRef(null);
 
   function handleClose() {
@@ -50,9 +54,15 @@ export default function CreatePostModal({
         hashTags,
         title,
         content,
+        postId,
       });
 
-      setPost(response.data.post);
+      if (postId) {
+        updatePost(postId, response.data.post);
+      } else {
+        setPost(response.data.post);
+      }
+
       handleClose();
     } catch (error) {
       console.error(error);
@@ -74,6 +84,7 @@ export default function CreatePostModal({
           apiKey={process.env.NEXT_PUBLIC_TinyMCE_API_Key}
           // @ts-expect-error: Type 'Editor' is not assignable to type 'null' and I'm not sure what to do
           onInit={(_evt, editor) => (editorRef.current = editor)}
+          initialValue={initialValue}
           init={{
             height: 500,
             menubar: true,
