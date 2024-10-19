@@ -1,10 +1,10 @@
 import {
   readPosts,
   createPost,
-  createPostTag,
   readPost,
-  readTag,
-  createTag,
+  updatePost,
+  updatePostTags,
+  createPostTags,
 } from "../../../../prisma/db";
 
 export async function GET() {
@@ -25,7 +25,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { title, content, hashTags } = await request.json();
+  const { title, content, hashTags, postId } = await request.json();
 
   if (!title || !content || hashTags.length === 0) {
     return Response.json(
@@ -41,34 +41,32 @@ export async function POST(request: Request) {
     .split(",")
     .map((tagName: string) => tagName.trim().replace("#", "").toLowerCase());
 
-  try {
-    const newPost = await createPost(title, content);
+  if (postId) {
+    try {
+      const updatedPost = await updatePost(postId, title, content);
+      await updatePostTags(postId, tagNames);
 
-    await Promise.all(
-      tagNames.map(async (tagName: string) => {
-        const tag = await readTag(tagName);
+      const post = await readPost(updatedPost.id);
 
-        if (tag) {
-          await createPostTag(newPost.id, tag.id);
-        } else {
-          const newTag = await createTag(tagName);
+      return Response.json({ post }, { status: 200 });
+    } catch (error) {
+      console.error(error);
 
-          await createPostTag(newPost.id, newTag.id);
-        }
-      })
-    );
+      return Response.json({ error: "Something went wrong" }, { status: 500 });
+    }
+  } else {
+    try {
+      const newPost = await createPost(title, content);
 
-    const post = await readPost(newPost.id);
+      await createPostTags(newPost.id, tagNames);
 
-    return Response.json({ post }, { status: 201 });
-  } catch (error) {
-    console.error(error);
+      const post = await readPost(newPost.id);
 
-    return Response.json(
-      {
-        error: "Something went wrong",
-      },
-      { status: 500 }
-    );
+      return Response.json({ post }, { status: 201 });
+    } catch (error) {
+      console.error(error);
+
+      return Response.json({ error: "Something went wrong" }, { status: 500 });
+    }
   }
 }
