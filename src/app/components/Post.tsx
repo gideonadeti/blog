@@ -10,10 +10,7 @@ export default function Post({ post }: { post: ExtendedPost }) {
       <div>
         <p
           dangerouslySetInnerHTML={{
-            __html:
-              post.title.length > 60
-                ? `${post.title.slice(0, 60)}...`
-                : post.title,
+            __html: post.title,
           }}
         />
         <p
