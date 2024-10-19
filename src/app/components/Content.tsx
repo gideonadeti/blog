@@ -13,12 +13,13 @@ import axios from "axios";
 
 import { usePostsStore } from "../stores/posts";
 import { useTagsStore } from "../stores/tags";
+import { ExtendedPost } from "../types";
 
 export default function Content() {
   const { posts, setPosts } = usePostsStore();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [filteredPosts, setFilteredPosts] = useState(posts);
+  const [loading, setLoading] = useState(true);
+  const [filteredPosts, setFilteredPosts] = useState<ExtendedPost[]>([]);
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
   const { setTags } = useTagsStore();
@@ -26,15 +27,13 @@ export default function Content() {
   useEffect(() => {
     async function fetchData() {
       try {
-        setLoading(true);
-
-        const responses = await Promise.all([
+        const [postsResponse, tagsResponse] = await Promise.all([
           axios.get("/api/posts"),
           axios.get("/api/tags"),
         ]);
 
-        setPosts(responses[0].data.posts);
-        setTags(responses[1].data.tags);
+        setPosts(postsResponse.data.posts);
+        setTags(tagsResponse.data.tags);
       } catch (error) {
         console.error(error);
 
@@ -58,29 +57,20 @@ export default function Content() {
   }, [filter, posts]);
 
   function formatDate(date: Date) {
-    let formattedDate;
     const distanceToNow = formatDistanceToNow(date, { addSuffix: true });
 
     if (isToday(date)) {
-      formattedDate = `${format(date, "h:mm a")} (${distanceToNow})`;
+      return `${format(date, "h:mm a")} (${distanceToNow})`;
     } else if (isYesterday(date)) {
-      formattedDate = `Yesterday at ${format(
-        date,
-        "h:mm a"
-      )} (${distanceToNow})`;
+      return `Yesterday at ${format(date, "h:mm a")} (${distanceToNow})`;
     } else if (isThisYear(date)) {
-      formattedDate = `${format(
-        date,
-        "eee, do MMM 'at' h:mm a"
-      )} (${distanceToNow})`;
+      return `${format(date, "eee, do MMM 'at' h:mm a")} (${distanceToNow})`;
     } else {
-      formattedDate = `${format(
+      return `${format(
         date,
         "eee, do MMM, yyyy 'at' h:mm a"
       )} (${distanceToNow})`;
     }
-
-    return formattedDate;
   }
 
   return (
@@ -94,7 +84,7 @@ export default function Content() {
         )}
       </div>
 
-      {filteredPosts.length === 0 && (
+      {!loading && filteredPosts.length === 0 && (
         <p className="text-center">No posts found</p>
       )}
 
