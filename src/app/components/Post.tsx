@@ -6,8 +6,8 @@ export default function Post({ post }: { post: ExtendedPost }) {
     <li className="list-group-item">
       <small className="fw-semibold">{formatDate(post.updatedAt)}</small>
       <div>
-        <p>{post.title}</p>
-        <p>{post.content}</p>
+        <p dangerouslySetInnerHTML={{ __html: post.title }} />
+        <p dangerouslySetInnerHTML={{ __html: post.content }} />
       </div>
       <div>
         <span className="small fst-italic text-secondary">
