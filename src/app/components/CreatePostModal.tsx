@@ -36,8 +36,6 @@ export default function CreatePostModal({
       /<p[^>]*>.*?\/sep.*?<\/p>/i
     );
 
-    console.log({ hashTags, title, content });
-
     if (hashTags.length === 0 || title.length === 0 || content.length === 0) {
       setError(
         "Please enter a valid post. Include hashTags, title, and content."

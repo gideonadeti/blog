@@ -149,3 +149,22 @@ export async function readTag(name: string) {
     throw error;
   }
 }
+
+export async function updatePublish(postId: string, published: boolean) {
+  try {
+    const post = await prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        published,
+      },
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
