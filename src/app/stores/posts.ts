@@ -18,5 +18,11 @@ export const usePostsStore = create<PostsStore>((set) => ({
     }));
   },
 
+  deletePost: (postId) => {
+    set((state) => ({
+      posts: state.posts.filter((post) => post.id !== postId),
+    }));
+  },
+
   clearPosts: () => set({ posts: [] }),
 }));

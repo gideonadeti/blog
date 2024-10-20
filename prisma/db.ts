@@ -251,3 +251,17 @@ export async function createPostTags(postId: string, tagNames: string[]) {
     throw error;
   }
 }
+
+export async function deletePost(postId: string) {
+  try {
+    await prisma.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}

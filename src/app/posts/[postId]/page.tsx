@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Alert from "react-bootstrap/Alert";
+import { useRouter } from "next/navigation";
 
 import { usePostsStore } from "@/app/stores/posts";
 import { ExtendedPost } from "@/app/types";
@@ -11,13 +12,14 @@ import CreatePostModal from "@/app/components/CreatePostModal";
 
 export default function Post({ params }: { params: { postId: string } }) {
   const postId = params.postId;
-  const { posts } = usePostsStore();
+  const { posts, deletePost } = usePostsStore();
   const [post, setPost] = useState<ExtendedPost | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [showCPModal, setShowCPModal] = useState(false);
   const [initialValue, setInitialValue] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const foundPost = posts.find((post) => post.id === postId);
@@ -62,6 +64,36 @@ export default function Post({ params }: { params: { postId: string } }) {
     }
   }
 
+  async function handleDelete() {
+    const confirmed = confirm("Are you sure you want to delete this post?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.delete(`/api/posts/${post?.id}`);
+
+      setMessage(response.data.message);
+
+      setTimeout(() => {
+        if (post) {
+          deletePost(post.id);
+        }
+
+        router.push("/");
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div>
       {error && (
@@ -92,6 +124,7 @@ export default function Post({ params }: { params: { postId: string } }) {
           <button
             className="btn btn-sm btn-outline-secondary"
             onClick={handleEdit}
+            disabled={loading}
           >
             Edit
           </button>
@@ -101,6 +134,13 @@ export default function Post({ params }: { params: { postId: string } }) {
             disabled={loading}
           >
             {post.published ? "Unpublish" : "Publish"}
+          </button>
+          <button
+            className="btn btn-sm btn-outline-danger"
+            onClick={handleDelete}
+            disabled={loading}
+          >
+            Delete
           </button>
         </span>
       </div>
