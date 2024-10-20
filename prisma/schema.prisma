@@ -22,7 +22,7 @@ model Comment {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   content String
   postId  String @db.ObjectId
-  post    Post   @relation(fields: [postId], references: [id])
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Tag {
@@ -33,7 +33,7 @@ model Tag {
 
 model PostTag {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
-  post   Post   @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.ObjectId
   tag    Tag    @relation(fields: [tagId], references: [id])
   tagId  String @db.ObjectId
