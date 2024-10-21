@@ -1,28 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-const corsOptions = {
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Allow-Origin": "*", // Allow all origins
-};
+export function middleware() {
+  // retrieve the current response
+  const res = NextResponse.next();
 
-export function middleware(req: NextRequest) {
-  // Handle preflight (OPTIONS) requests
-  if (req.method === "OPTIONS") {
-    return NextResponse.json({}, { headers: corsOptions });
-  }
+  // add the CORS headers to the response
+  res.headers.append("Access-Control-Allow-Credentials", "true");
+  res.headers.append("Access-Control-Allow-Origin", "*");
+  res.headers.append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.headers.append(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
 
-  // Handle actual requests
-  const response = NextResponse.next();
-
-  // Set CORS headers for all origins
-  Object.entries(corsOptions).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-
-  return response;
+  return res;
 }
 
+// specify the path regex to apply the middleware to
 export const config = {
   matcher: "/api/:path*",
 };
