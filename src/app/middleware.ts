@@ -1,29 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const allowedOrigins = ["http://localhost:5173"];
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Origin": "*", // Allow all origins
 };
 
 export function middleware(req: NextRequest) {
-  const origin = req.headers.get("origin") ?? "";
-  const isAllowedOrigin = allowedOrigins.includes(origin);
-
+  // Handle preflight (OPTIONS) requests
   if (req.method === "OPTIONS") {
-    const preflightHeaders = {
-      "Access-Control-Allow-Origin": isAllowedOrigin ? origin : "",
-      ...corsOptions,
-    };
-    return NextResponse.json({}, { headers: preflightHeaders });
+    return NextResponse.json({}, { headers: corsOptions });
   }
 
+  // Handle actual requests
   const response = NextResponse.next();
 
-  if (isAllowedOrigin) {
-    response.headers.set("Access-Control-Allow-Origin", origin);
-  }
-
+  // Set CORS headers for all origins
   Object.entries(corsOptions).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
